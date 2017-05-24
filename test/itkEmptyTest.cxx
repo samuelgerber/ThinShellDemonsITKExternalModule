@@ -131,7 +131,7 @@ int itkEmptyTest( int , char * [])
 	
 	transformTest->SetMeshTemplate(movingMesh);
 	transformTest->Initialize();
-
+	std::cout<<transformTest->GetNumberOfParameters()<<std::endl;
 	/*
 		Initialize Thin Shell Demons optimizer
 	*/

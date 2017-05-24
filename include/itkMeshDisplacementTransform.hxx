@@ -27,7 +27,7 @@ namespace itk
 
 template<typename TParametersValueType, unsigned int NDimensions>
 MeshDisplacementTransform<TParametersValueType, NDimensions>
-	::MeshDisplacementTransform()
+	::MeshDisplacementTransform() : Superclass(0)
 {
 	m_MeshTemplate = ITK_NULLPTR;
 	this->SpaceDimension = NDimensions;
@@ -47,29 +47,23 @@ void
 MeshDisplacementTransform<TParametersValueType, NDimensions>
 ::SetParameters(const ParametersType & parameters)
 {
-  // Save parameters. Needed for proper operation of TransformUpdateParameters.
-	if( &parameters != &(this->m_Parameters) )
+	if( parameters.Size() != this->ParametersDimension )
 	{
-		this->m_Parameters = parameters;
+		itkExceptionMacro( << "Mismatch between parameters size "
+			<< parameters.Size() << " and expected number of parameters "
+			<< this->ParametersDimension );
 	}
 
-	MeshDeformationType::PixelType  deformationVector;
-	unsigned int numberOfPoints = ParametersDimension/SpaceDimension;
-	bool modified = false;
+	if( &parameters != &( this->m_VectorField ) )
+	{
+		// Clean up this->m_InternalParametersBuffer because we will
+		// use an externally supplied set of parameters as the buffer
+		this->m_VectorField = parameters;
+	}
 
-	for (unsigned int i = 0; i < numberOfPoints; i++ ){
-		deformationVector = this->m_MeshDeformation->GetPointData(i);
-		for (unsigned int j = 0; j < SpaceDimension; j++)
-			if( Math::NotExactlyEquals(deformationVector[j], parameters[i*SpaceDimension+j]) )
-			{
-				deformationVector[j] = parameters[i*SpaceDimension+j];
-				this->m_MeshDeformation->SetPointData(i,deformationVector);
-				modified = true;
-			}
-	}
-	if( modified ){
-		this->Modified();
-	}
+	// Modified is always called since we just have a pointer to the
+	// parameters and cannot know if the parameters have changed.
+	this->Modified();
 }
 
 template<typename TParametersValueType, unsigned int NDimensions>
@@ -77,15 +71,11 @@ const typename MeshDisplacementTransform<TParametersValueType, NDimensions>::Par
 MeshDisplacementTransform<TParametersValueType, NDimensions>
 ::GetParameters() const
 {
-	MeshDeformationType::PixelType  deformationVector;
-	unsigned int numberOfPoints = ParametersDimension/SpaceDimension;
 
-	for (unsigned int i = 0; i < numberOfPoints; i++ ){
-		deformationVector = this->m_MeshDeformation->GetPointData(i);
-		for (unsigned int j = 0; j < SpaceDimension; j++)
-			this->m_Parameters[i*SpaceDimension + j] = deformationVector[j];
+	for( unsigned int i = 0; i < ParametersDimension; i++ )
+	{
+		this->m_Parameters[i] = this->m_VectorField[i];
 	}
-
 	return this->m_Parameters;
 }
 
@@ -103,26 +93,7 @@ void
 		itkExceptionMacro(<< "Mesh template has zero vertex");
 	}
 
-	MeshDeformationType::PixelType  deformationVector;
-	MeshDeformationType::PointType  point;
-
-	PointIterator pointItr = this->GetMeshTemplate()->GetPoints()->Begin();
-	PointIterator pointEnd = this->GetMeshTemplate()->GetPoints()->End();
-
-	unsigned int pointId =  0;
-	while ( pointItr != pointEnd )
-	{
-		deformationVector[0] =  0;
-		deformationVector[1] =  0;
-		deformationVector[2] =  0;  
-
-		typename Superclass::InputPointType inputPoint;
-		inputPoint.CastFrom( pointItr.Value() );
-
-		m_MeshDeformation->SetPoint( pointId, inputPoint );
-		m_MeshDeformation->SetPointData( pointId, deformationVector );
-		pointId++;
-	}
+	m_VectorField.Fill(0);
 }
 
 template<typename TParametersValueType, unsigned int NDimensions>
@@ -135,34 +106,11 @@ void
 		itkExceptionMacro(<< "FixedMesh is not present");
 	}
 
-	m_MeshDeformation = MeshDeformationType::New();
-	MeshDeformationType::PixelType  deformationVector;
-	MeshDeformationType::PointType  point;
+	//m_VectorField = VectorFieldType::New();
+	m_VectorField.SetSize(m_MeshTemplate->GetNumberOfPoints() * SpaceDimension);
+	m_VectorField.Fill(0);
+	this->ParametersDimension = m_VectorField.GetSize();
 
-	PointIterator pointItr = this->GetMeshTemplate()->GetPoints()->Begin();
-	PointIterator pointEnd = this->GetMeshTemplate()->GetPoints()->End();
-
-	unsigned int pointId =  0;
-	while ( pointItr != pointEnd )
-	{
-		deformationVector[0] =  0;
-		deformationVector[1] =  0;
-		deformationVector[2] =  0;  
-
-		typename Superclass::InputPointType inputPoint;
-		inputPoint.CastFrom( pointItr.Value() );
-
-		m_MeshDeformation->SetPoint( pointId, inputPoint );
-		m_MeshDeformation->SetPointData( pointId, deformationVector );
-		pointId++;
-	}
-
-	this->m_Parameters.SetParametersObject(m_MeshDeformation->GetPointData());
-	this->ParametersDimension = pointId * this->SpaceDimension;
-
-	//Superclass()
-	//itkStaticConstMacro(SpaceDimension, unsigned int, NDimensions);
-	//itkStaticConstMacro(ParametersDimension, unsigned int, NDimensions);
 }
 
 template<typename TParametersValueType, unsigned int NDimensions>

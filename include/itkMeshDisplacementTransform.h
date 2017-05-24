@@ -92,15 +92,16 @@ public:
   typedef typename Superclass::TransformCategoryType TransformCategoryType;
 
   /** Displacement field for this class. */
-  typedef itk::Vector< TParametersValueType, NDimensions >    PixelType;
-  typedef itk::Mesh< PixelType, NDimensions > MeshDeformationType;
-  typedef typename MeshDeformationType::Pointer MeshDeformationPointer;
+//   typedef itk::Vector< TParametersValueType, NDimensions >    PixelType;
+//   typedef itk::Mesh< PixelType, NDimensions > MeshDeformationType;
+//   typedef typename MeshDeformationType::Pointer MeshDeformationPointer;
+//   typedef typename MeshDeformationType::PointsContainer::ConstIterator    MeshDeformationPointIterator;
+//   typedef typename MeshDeformationType::PointDataContainer::ConstIterator MeshDeformationPointDataIterator;
 
   typedef itk::Mesh< TParametersValueType, NDimensions > MeshType;
   typedef typename MeshType::ConstPointer MeshConstPointer;
-
-  typedef typename MeshType::PointsContainer::ConstIterator    PointIterator;
-  typedef typename MeshType::PointDataContainer::ConstIterator PointDataIterator;
+  typedef typename MeshType::PointsContainer::ConstIterator    MeshPointIterator;
+  typedef typename MeshType::PointDataContainer::ConstIterator MeshPointDataIterator;
 
   /** Set/Get the Mesh. */
   itkSetConstObjectMacro(MeshTemplate, MeshType);
@@ -156,7 +157,7 @@ public:
   /** Return the number of parameters that completely define the Transfom  */
    virtual NumberOfParametersType GetNumberOfParameters() const ITK_OVERRIDE
    {
-     return NDimensions;
+     return this->ParametersDimension;
    }
 
   /** Indicates that this transform is linear. That is, given two
@@ -204,9 +205,10 @@ private:
 
   unsigned int SpaceDimension;
   unsigned int ParametersDimension;
-  MeshDeformationPointer m_MeshDeformation;
+  //MeshDeformationPointer m_MeshDeformation;
   MeshConstPointer m_MeshTemplate;
   JacobianType     m_IdentityJacobian;
+  ParametersType m_VectorField;
   //OutputVectorType m_Offset; // Offset of the transformation
 };                           // class MeshDisplacementTransform
 

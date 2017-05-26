@@ -72,11 +72,11 @@ MeshDisplacementTransform<TParametersValueType, NDimensions>
 ::GetParameters() const
 {
 
-	for( unsigned int i = 0; i < ParametersDimension; i++ )
-	{
-		this->m_Parameters[i] = this->m_VectorField[i];
-	}
-	return this->m_Parameters;
+// 	for( unsigned int i = 0; i < ParametersDimension; i++ )
+// 	{
+// 		this->m_Parameters[i] = this->m_VectorField[i];
+// 	}
+	return this->m_VectorField;
 }
 
 template<typename TParametersValueType, unsigned int NDimensions>
@@ -84,7 +84,7 @@ void
 	MeshDisplacementTransform<TParametersValueType, NDimensions>
 	::SetIdentity()
 {
-	if (!m_Mesh)
+	if (!m_MeshTemplate)
 	{
 		itkExceptionMacro(<< "Mesh template is not present");
 	}
@@ -122,30 +122,6 @@ MeshDisplacementTransform<TParametersValueType, NDimensions>
 
 //  os << indent << "Offset: " << m_Offset << std::endl;
 }
-
-
-// template<typename TParametersValueType, unsigned int NDimensions>
-// void
-// MeshDisplacementTransform<TParametersValueType, NDimensions>
-// ::Compose(const Self *other, bool)
-// {
-//   this->Translate(other->m_Offset);
-// }
-
-
-// template<typename TParametersValueType, unsigned int NDimensions>
-// void
-// MeshDisplacementTransform<TParametersValueType, NDimensions>
-// ::Translate(const OutputVectorType & offset, bool)
-// {
-//   ParametersType newOffset(SpaceDimension);
-// 
-//   for( unsigned int i = 0; i < SpaceDimension; i++ )
-//     {
-//     newOffset[i] = m_Offset[i] + offset[i];
-//     }
-//   this->SetParameters(newOffset);
-// }
 
 
 template<typename TParametersValueType, unsigned int NDimensions>

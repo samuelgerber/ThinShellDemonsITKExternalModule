@@ -81,8 +81,8 @@ public:
   typedef typename Superclass::MovingPointIterator     MovingPointIterator;
   typedef typename Superclass::MovingPointDataIterator MovingPointDataIterator;
 
-  typedef TDistanceMap                           DistanceMapType;
-  typedef typename DistanceMapType::ConstPointer DistanceMapPointer;
+  typedef typename Superclass::InputPointType InputPointType;
+  typedef itk::MapContainer<int, InputPointType> TargetMapType;
 
   /** Get the number of values, i.e. the number of points in the moving set. */
   unsigned int GetNumberOfValues() const ITK_OVERRIDE;
@@ -98,18 +98,9 @@ public:
   void GetValueAndDerivative(const TransformParametersType & parameters,
                              MeasureType & Value, DerivativeType & Derivative) const;
 
-  /** Set/Get the distance map. */
-  itkSetConstObjectMacro(DistanceMap, DistanceMapType);
-  itkGetConstObjectMacro(DistanceMap, DistanceMapType);
-
-  /** Set/Get if the distance should be squared.
-   *  When set to true, the filter's computational speed is slighlty imporved,
-   *  but it will result in minimizing the sum of distances^4 instead of the
-   *  sum of distances^2. Default is On. */
-  itkSetMacro(ComputeSquaredDistance, bool);
-  itkGetConstMacro(ComputeSquaredDistance, bool);
-  itkBooleanMacro(ComputeSquaredDistance);
-
+  /** Initialize the Metric by making sure that all the components
+   *  are present and plugged together correctly     */
+  virtual void Initialize(void) throw ( ExceptionObject ) ITK_OVERRIDE;
 protected:
   ThinShellDemonsMetric();
   virtual ~ThinShellDemonsMetric() {}
@@ -119,8 +110,9 @@ protected:
 private:
   ITK_DISALLOW_COPY_AND_ASSIGN(ThinShellDemonsMetric);
 
-  DistanceMapPointer m_DistanceMap;
-  bool               m_ComputeSquaredDistance;
+  bool               m_TargetPositionComputed;
+  TargetMapType targetMap;
+  void ComputeTargetPosition();
 };
 } // end namespace itk
 

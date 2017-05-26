@@ -58,7 +58,7 @@ int itkEmptyTest( int , char * [])
 {
 
 	const unsigned int Dimension = 3;
-	typedef itk::Mesh<float, Dimension>   MeshType;
+	typedef itk::Mesh<double, Dimension>   MeshType;
 	typedef itk::VTKPolyDataReader< MeshType >  ReaderType;
 
 	/*
@@ -126,7 +126,7 @@ int itkEmptyTest( int , char * [])
 	typedef itk::TranslationTransform< double, Dimension >      TransformType;
 	TransformType::Pointer transform = TransformType::New();
 
-	typedef itk::MeshDisplacementTransform< float, Dimension >    TransformTestType;
+	typedef itk::MeshDisplacementTransform< double, Dimension >    TransformTestType;
 	TransformTestType::Pointer transformTest = TransformTestType::New();
 	
 	transformTest->SetMeshTemplate(movingMesh);
@@ -143,7 +143,7 @@ int itkEmptyTest( int , char * [])
 		MeshType >
 		RegistrationType;
 	// Scale the translation components of the Transform in the Optimizer
-	OptimizerType::ScalesType scales( transform->GetNumberOfParameters() );
+	OptimizerType::ScalesType scales( transformTest->GetNumberOfParameters() );
 	scales.Fill( 0.01 );
 	unsigned long   numberOfIterations =  100;
 	double          gradientTolerance  =  1e-5;    // convergence criterion
@@ -156,7 +156,7 @@ int itkEmptyTest( int , char * [])
 	optimizer->SetEpsilonFunction( epsilonFunction );
 	// Start from an Identity transform (in a normal case, the user
 	// can probably provide a better guess than the identity...
-	transform->SetIdentity();
+	transformTest->SetIdentity();
 
 	/*
 		Initialize registration
@@ -169,8 +169,8 @@ int itkEmptyTest( int , char * [])
 
 	registration->SetMetric(        metric        );
 	registration->SetOptimizer(     optimizer     );
-	registration->SetTransform(     transform     );
-	registration->SetInitialTransformParameters( transform->GetParameters() );
+	registration->SetTransform(     transformTest     );
+	registration->SetInitialTransformParameters( transformTest->GetParameters() );
 	registration->SetFixedMesh( fixedMesh );
 	registration->SetMovingMesh( movingMesh );
 

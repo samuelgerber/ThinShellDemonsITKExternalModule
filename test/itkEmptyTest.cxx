@@ -21,7 +21,7 @@
 #include "itkVTKPolyDataWriter.h"
 #include "itkThinShellDemonsMetric.h"
 #include "itkTranslationTransform.h"
-#include "itkLevenbergMarquardtOptimizer.h"
+#include "itkConjugateGradientOptimizer.h"
 #include "itkMeshToMeshRegistrationMethod.h"
 #include "itkMeshDisplacementTransform.h"
 
@@ -35,7 +35,7 @@ public:
 protected:
 	CommandIterationUpdate() {};
 public:
-	typedef itk::LevenbergMarquardtOptimizer     OptimizerType;
+	typedef itk::ConjugateGradientOptimizer     OptimizerType;
 	typedef const OptimizerType *                OptimizerPointer;
 	void Execute(itk::Object *caller, const itk::EventObject & event)
 	{
@@ -48,7 +48,7 @@ public:
 		{
 			return;
 		}
-		//std::cout << "Value = " << optimizer->GetCachedValue() << std::endl;
+
 		std::cout << "Position = "  << optimizer->GetCachedCurrentPosition();
 		std::cout << std::endl << std::endl;
 	}
@@ -123,40 +123,24 @@ int itkEmptyTest( int , char * [])
 	/*
 		Initialize Thin Shell Demons transformation
 	*/
-	typedef itk::TranslationTransform< double, Dimension >      TransformType;
-	TransformType::Pointer transform = TransformType::New();
 
 	typedef itk::MeshDisplacementTransform< double, Dimension >    TransformTestType;
-	TransformTestType::Pointer transformTest = TransformTestType::New();
+	TransformTestType::Pointer transform = TransformTestType::New();
 	
-	transformTest->SetMeshTemplate(movingMesh);
-	transformTest->Initialize();
-	std::cout<<transformTest->GetNumberOfParameters()<<std::endl;
+	transform->SetMeshTemplate(movingMesh);
+	transform->Initialize();
+	transform->SetIdentity();
+	std::cout<<transform->GetNumberOfParameters()<<std::endl;
+
 	/*
 		Initialize Thin Shell Demons optimizer
 	*/
-	typedef itk::LevenbergMarquardtOptimizer OptimizerType;
+	typedef itk::ConjugateGradientOptimizer     OptimizerType;
 	OptimizerType::Pointer      optimizer     = OptimizerType::New();
-	optimizer->SetUseCostFunctionGradient(false);
 	typedef itk::MeshToMeshRegistrationMethod<
 		MeshType,
 		MeshType >
 		RegistrationType;
-	// Scale the translation components of the Transform in the Optimizer
-	OptimizerType::ScalesType scales( transformTest->GetNumberOfParameters() );
-	scales.Fill( 0.01 );
-	unsigned long   numberOfIterations =  100;
-	double          gradientTolerance  =  1e-5;    // convergence criterion
-	double          valueTolerance     =  1e-5;    // convergence criterion
-	double          epsilonFunction    =  1e-6;   // convergence criterion
-	optimizer->SetScales( scales );
-	optimizer->SetNumberOfIterations( numberOfIterations );
-	optimizer->SetValueTolerance( valueTolerance );
-	optimizer->SetGradientTolerance( gradientTolerance );
-	optimizer->SetEpsilonFunction( epsilonFunction );
-	// Start from an Identity transform (in a normal case, the user
-	// can probably provide a better guess than the identity...
-	transformTest->SetIdentity();
 
 	/*
 		Initialize registration
@@ -169,14 +153,15 @@ int itkEmptyTest( int , char * [])
 
 	registration->SetMetric(        metric        );
 	registration->SetOptimizer(     optimizer     );
-	registration->SetTransform(     transformTest     );
-	registration->SetInitialTransformParameters( transformTest->GetParameters() );
+	registration->SetTransform(     transform     );
+	registration->SetInitialTransformParameters( transform->GetParameters() );
 	registration->SetFixedMesh( fixedMesh );
 	registration->SetMovingMesh( movingMesh );
 
 	// Connect an observer
 	CommandIterationUpdate::Pointer observer = CommandIterationUpdate::New();
 	optimizer->AddObserver( itk::IterationEvent(), observer );
+
 	try
 	{
 		registration->Update();
@@ -193,6 +178,7 @@ int itkEmptyTest( int , char * [])
 	*/
 	typedef itk::VTKPolyDataWriter<MeshType>   WriterType;
 	WriterType::Pointer writer = WriterType::New();
+	registration->GetDeformedMesh();
 	MeshType::ConstPointer registeredMesh = registration->GetMovingMesh();
 	writer->SetInput( registeredMesh );
 	writer->SetFileName( "registeredMesh.vtk" );

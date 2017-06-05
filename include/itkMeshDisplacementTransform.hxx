@@ -129,9 +129,19 @@ typename MeshDisplacementTransform<TParametersValueType, NDimensions>::OutputPoi
 MeshDisplacementTransform<TParametersValueType, NDimensions>
 ::TransformPoint(const InputPointType & point) const
 {
-  return point;
+	return point;
 }
 
+template<typename TParametersValueType, unsigned int NDimensions>
+typename MeshDisplacementTransform<TParametersValueType, NDimensions>::OutputPointType
+	MeshDisplacementTransform<TParametersValueType, NDimensions>
+	::TransformNthPoint(const InputPointType & point, int identifier) const
+{
+	InputVectorType vec;
+	vec[0] = m_VectorField[identifier];
+
+	return point + vec;
+}
 
 template<typename TParametersValueType, unsigned int NDimensions>
 typename MeshDisplacementTransform<TParametersValueType, NDimensions>::OutputVectorType

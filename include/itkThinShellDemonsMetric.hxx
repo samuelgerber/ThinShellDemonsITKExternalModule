@@ -64,23 +64,9 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 		  m_FixedMesh->GetSource()->Update();
 	  }
 
+	  // Preprocessing: compute the target position of each vertex using Euclidean + Curvature distance
 	  ComputeTargetPosition();
   }
-
-template< typename TFixedMesh, typename TMovingMesh, typename TDistanceMap >
-unsigned int
-ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
-::GetNumberOfValues() const
-{
-  MovingMeshConstPointer movingMesh = this->GetMovingMesh();
-
-  if ( !movingMesh )
-    {
-    itkExceptionMacro(<< "Moving point set has not been assigned");
-    }
-
-  return movingMesh->GetPoints()->Size();
-}
 
 template< typename TFixedMesh, typename TMovingMesh, typename TDistanceMap >
 void
@@ -170,63 +156,91 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
   MovingPointIterator pointItr = movingMesh->GetPoints()->Begin();
   MovingPointIterator pointEnd = movingMesh->GetPoints()->End();
 
-  MeasureType measure;
-  measure.set_size( fixedMesh->GetNumberOfPoints() );
 
   this->SetTransformParameters(parameters);
 
+  // data fidelity energy (squared distance to target position)
   int identifier = 0;
   double functionValue = 0;
   while ( pointItr != pointEnd )
     {
+	// get the current position of the vertex
     InputPointType inputPoint;
     inputPoint.CastFrom( pointItr.Value() );
-    typename Superclass::OutputPointType transformedPoint =
-      this->m_Transform->TransformPoint(inputPoint);
+	InputVectorType vec;
+	vec[0] = parameters[identifier*3];
+	vec[1] = parameters[identifier*3+1];
+	vec[2] = parameters[identifier*3+2];
+	typename Superclass::OutputPointType transformedPoint = inputPoint + vec;
 
 	InputPointType targetPoint = targetMap.ElementAt (identifier);
 	double dist = targetPoint.SquaredEuclideanDistanceTo(transformedPoint);
-	measure.put(identifier,dist);
 
 	functionValue += dist;
-//     double minimumDistance = NumericTraits< double >::max();
-//     bool   closestPoint = false;
-// 
-//     // If the closestPoint has not been found, go through the list of fixed
-//     // points and find the closest distance
-//     if ( !closestPoint )
-//       {
-//       FixedPointIterator pointItr2 = fixedMesh->GetPoints()->Begin();
-//       FixedPointIterator pointEnd2 = fixedMesh->GetPoints()->End();
-// 
-//       while ( pointItr2 != pointEnd2 )
-//         {
-//         double dist = pointItr2.Value().SquaredEuclideanDistanceTo(transformedPoint);
-// 
-// 
-//         if ( dist < minimumDistance )
-//           {
-//           minimumDistance = dist;
-//           }
-//         pointItr2++;
-//         }
-//       }
-// 
-//     measure.put(identifier, minimumDistance);
 
     ++pointItr;
     identifier++;
     }
 
-  return measure;
+  return functionValue;
 }
 
 template< typename TFixedMesh, typename TMovingMesh, typename TDistanceMap >
 void
 ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
-::GetDerivative( const TransformParametersType & itkNotUsed(parameters),
-                 DerivativeType & itkNotUsed(derivative) ) const
-{}
+::GetDerivative( const TransformParametersType & parameters,
+                 DerivativeType & derivative ) const
+{// Set output values to zero
+	FixedMeshConstPointer fixedMesh = this->GetFixedMesh();
+
+	if ( !fixedMesh )
+	{
+		itkExceptionMacro(<< "Fixed point set has not been assigned");
+	}
+
+	MovingMeshConstPointer movingMesh = this->GetMovingMesh();
+
+	if ( !movingMesh )
+	{
+		itkExceptionMacro(<< "Moving point set has not been assigned");
+	}
+
+
+	if( derivative.GetSize() != fixedMesh->GetNumberOfPoints() * 3 )
+	{
+		derivative = DerivativeType(fixedMesh->GetNumberOfPoints() * 3);
+	}
+	memset( derivative.data_block(),
+		0,
+		fixedMesh->GetNumberOfPoints() * 3 * sizeof( double ) );
+
+	// derivative of data fidelity energy (squared distance to target position)
+	MovingPointIterator pointItr = movingMesh->GetPoints()->Begin();
+	MovingPointIterator pointEnd = movingMesh->GetPoints()->End();
+
+	int identifier = 0;
+	double functionValue = 0;
+	while ( pointItr != pointEnd )
+	{
+		InputPointType inputPoint;
+		inputPoint.CastFrom( pointItr.Value() );
+		InputVectorType vec;
+		vec[0] = parameters[identifier*3];
+		vec[1] = parameters[identifier*3+1];
+		vec[2] = parameters[identifier*3+2];
+		typename Superclass::OutputPointType transformedPoint = inputPoint + vec;
+
+		InputPointType targetPoint = targetMap.ElementAt (identifier);
+
+		InputPointType::VectorType distVec = targetPoint - inputPoint;
+		derivative[identifier*3]     = -2 * distVec[0];
+		derivative[identifier*3 + 1] = -2 * distVec[1];
+		derivative[identifier*3 + 2] = -2 * distVec[2];
+
+		++pointItr;
+		identifier++;
+	}
+}
 
 template< typename TFixedMesh, typename TMovingMesh, typename TDistanceMap >
 void

@@ -20,7 +20,7 @@
 
 #include "itkImageBase.h"
 #include "itkTransform.h"
-#include "itkMultipleValuedCostFunction.h"
+#include "itkSingleValuedCostFunction.h"
 #include "itkMacro.h"
 #include "itkGradientRecursiveGaussianImageFilter.h"
 
@@ -42,13 +42,13 @@ namespace itk
  */
 
 template< typename TFixedMesh,  typename TMovingMesh >
-class ITK_TEMPLATE_EXPORT MeshToMeshMetric:public MultipleValuedCostFunction
+class ITK_TEMPLATE_EXPORT MeshToMeshMetric:public SingleValuedCostFunction
 {
 public:
 
   /** Standard class typedefs. */
   typedef MeshToMeshMetric   Self;
-  typedef MultipleValuedCostFunction Superclass;
+  typedef SingleValuedCostFunction Superclass;
   typedef SmartPointer< Self >       Pointer;
   typedef SmartPointer< const Self > ConstPointer;
 
@@ -56,7 +56,7 @@ public:
   typedef Superclass::ParametersValueType CoordinateRepresentationType;
 
   /** Run-time type information (and related methods). */
-  itkTypeMacro(MeshToMeshMetric, MultipleValuedCostFunction);
+  itkTypeMacro(MeshToMeshMetric, SingleValuedCostFunction);
 
   /**  Type of the moving Mesh. */
   typedef TMovingMesh                           MovingMeshType;

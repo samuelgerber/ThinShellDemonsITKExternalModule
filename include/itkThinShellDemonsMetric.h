@@ -26,20 +26,11 @@
 namespace itk
 {
 /** \class ThinShellDemonsMetric
- * \brief Computes the minimum distance between a moving point-set
- *  and a fixed point-set. A vector of minimum closest point distance is
- *  created for each point in the moving point-set.
- *  No correspondance is needed.
- *  For speed consideration, the point-set with the minimum number of points
- *  should be used as the moving point-set.
- *  If the number of points is high, the possibility of setting a distance map
- *  should improve the speed of the closest point computation.
+ * \brief Initialize target point position using Euclidean + Curvature distance
+ *        Optimize the displacement field with thin shell physical energy regularization 
  *
- *  Reference: "A Method for Registration of 3-D Shapes",
- *             IEEE PAMI, Vol 14, No. 2, February 1992
+ *  Reference: "Thin Shell Demons: 
  *
- * \ingroup RegistrationMetrics
- * \ingroup ITKRegistrationCommon
  */
 template< typename TFixedMesh, typename TMovingMesh,
           typename TDistanceMap =
@@ -82,10 +73,9 @@ public:
   typedef typename Superclass::MovingPointDataIterator MovingPointDataIterator;
 
   typedef typename Superclass::InputPointType InputPointType;
+  typedef typename itk::Vector<double, TMovingMesh::PointDimension> InputVectorType;
   typedef itk::MapContainer<int, InputPointType> TargetMapType;
 
-  /** Get the number of values, i.e. the number of points in the moving set. */
-  unsigned int GetNumberOfValues() const ITK_OVERRIDE;
 
   /** Get the derivatives of the match measure. */
   void GetDerivative(const TransformParametersType & parameters,
@@ -98,8 +88,8 @@ public:
   void GetValueAndDerivative(const TransformParametersType & parameters,
                              MeasureType & Value, DerivativeType & Derivative) const;
 
-  /** Initialize the Metric by making sure that all the components
-   *  are present and plugged together correctly     */
+  /** Initialize the Metric by computing target position for each vertex using
+      Euclidean + Curvature distance */
   virtual void Initialize(void) throw ( ExceptionObject ) ITK_OVERRIDE;
 protected:
   ThinShellDemonsMetric();

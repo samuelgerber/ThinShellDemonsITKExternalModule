@@ -45,7 +45,7 @@ public:
 
 	/**  Type of the Moving Mesh. */
 	typedef          TMovingMesh                  MovingMeshType;
-	typedef typename MovingMeshType::ConstPointer MovingMeshConstPointer;
+	typedef typename MovingMeshType::Pointer MovingMeshConstPointer;
 
 	/**  Type of the Metric. */
 	typedef MeshToMeshMetric< FixedMeshType, MovingMeshType > MetricType;
@@ -62,7 +62,8 @@ public:
 	typedef typename TransformOutputType::ConstPointer TransformOutputConstPointer;
 
 	/**  Type of the Optimizer. */
-	typedef   MultipleValuedNonLinearOptimizer OptimizerType;
+	typedef	SingleValuedNonLinearOptimizer OptimizerType;
+	//typedef	typename	OptimizerType::InternalOptimizerType  vnlOptimizerType;
 
 	/** Type of the Transformation parameters. This is the same type used to
 	*  represent the search space of the optimization algorithm. */
@@ -73,8 +74,8 @@ public:
 	itkGetConstObjectMacro(FixedMesh, FixedMeshType);
 
 	/** Set/Get the Moving Mesh. */
-	itkSetConstObjectMacro(MovingMesh, MovingMeshType);
-	itkGetConstObjectMacro(MovingMesh, MovingMeshType);
+	itkSetObjectMacro(MovingMesh, MovingMeshType);
+	itkGetObjectMacro(MovingMesh, MovingMeshType);
 	
 	/** Set/Get the Optimizer. */
 	itkSetObjectMacro(Optimizer,  OptimizerType);
@@ -101,6 +102,9 @@ public:
 
 	/** Returns the transform resulting from the registration process  */
 	const TransformOutputType * GetOutput() const;
+
+	/** Deforms the pointset using the resulting transformation */
+	void GetDeformedMesh();
 
 	/** Make a DataObject of the correct type to be used as the specified
 	* output. */

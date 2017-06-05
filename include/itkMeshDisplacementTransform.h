@@ -136,7 +136,7 @@ public:
    using Superclass::TransformCovariantVector;
    OutputCovariantVectorType TransformCovariantVector(const InputCovariantVectorType & vector) const ITK_OVERRIDE;
 
-
+   OutputPointType     TransformNthPoint(const InputPointType  & point, int identifier) const;
   /** Return an inverse of this transform. */
   virtual InverseTransformBasePointer GetInverseTransform() const ITK_OVERRIDE;
 

@@ -84,7 +84,6 @@ void
 	m_Metric->SetMovingMesh(m_MovingMesh);
 	m_Metric->SetFixedMesh(m_FixedMesh);
 	m_Metric->SetTransform(m_Transform);
-
 	m_Metric->Initialize();
 
 	// Set up the optimizer
@@ -169,5 +168,37 @@ DataObject::Pointer
 		return ITK_NULLPTR;
 	}
 }
+template< typename TFixedMesh, typename TMovingMesh >
+void
+	MeshToMeshRegistrationMethod< TFixedMesh, TMovingMesh >
+	::GetDeformedMesh(){
+		// derivative of data fidelity energy (squared distance to target position)
+		typedef typename MovingMeshType::PointsContainer  OutputPointsContainer;
+		typedef typename MovingMeshType::PointsContainer  InputPointsContainer;
+
+		const InputPointsContainer * inPoints  = m_MovingMesh->GetPoints();
+		typename MovingMeshType::PointsContainerPointer outPoints = m_MovingMesh->GetPoints();
+
+		typename InputPointsContainer::ConstIterator inputPoint  = inPoints->Begin();
+		typename InputPointsContainer::ConstIterator inputEnd  = inPoints->End();
+		typename OutputPointsContainer::Iterator outputPoint = outPoints->Begin();
+
+		ParametersType m_VectorField = m_Transform->GetParameters();
+		int idx = 0;
+		while ( inputPoint != inputEnd )
+		{
+			const typename TMovingMesh::PointType & originalPoint = inputPoint.Value();
+			typename TMovingMesh::PointType   displacedPoint;
+			//MovingMeshType::PointType::VectorType vec;
+			for ( unsigned int i = 0; i < 3; i++ )
+			{
+				displacedPoint[i] = originalPoint[i] + m_VectorField[idx*3 + i];
+			}
+			outputPoint.Value() = displacedPoint;
+			++inputPoint;
+			++outputPoint;
+			idx++;
+		}
+	}
 }
 #endif

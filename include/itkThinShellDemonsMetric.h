@@ -26,10 +26,18 @@
 namespace itk
 {
 /** \class ThinShellDemonsMetric
- * \brief Initialize target point position using Euclidean + Curvature distance
- *        Optimize the displacement field with thin shell physical energy regularization 
+ * \brief This Class inherits the base MeshToMeshMetric
  *
- *  Reference: "Thin Shell Demons: 
+ * \brief It expects a mesh-to-mesh transformaton to be plugged in.
+ *        This class computes a metric value, which is a combination of
+ *        geometric feature matching quality and the Thin Shell deformation Energy.
+ *        This metric computation part (objective function) is the core of the Thin Shell Demons algorithm
+ *
+ * \usage When initializing a metric object of this class with two meshes, the metric object first
+ *        pre-computes geometric feature matching between the two meshes. The matching results stay the same
+ *        during the optimization process.
+ *
+ *  Reference: "Thin Shell Demons: Zhao Q, Price T, Pizer S, Niethammer M, Alterovitz R, Rosenman J, MIUA 2015
  *
  */
 template< typename TFixedMesh, typename TMovingMesh,
@@ -88,7 +96,7 @@ public:
   void GetValueAndDerivative(const TransformParametersType & parameters,
                              MeasureType & Value, DerivativeType & Derivative) const;
 
-  /** Initialize the Metric by computing target position for each vertex using
+  /** Initialize the Metric by computing a target position for each vertex in the fixed mesh using
       Euclidean + Curvature distance */
   virtual void Initialize(void) throw ( ExceptionObject ) ITK_OVERRIDE;
 protected:

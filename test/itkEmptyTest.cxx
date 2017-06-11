@@ -127,8 +127,9 @@ int itkEmptyTest( int , char * [])
 	typedef itk::MeshDisplacementTransform< double, Dimension >    TransformTestType;
 	TransformTestType::Pointer transform = TransformTestType::New();
 	
-	transform->SetMeshTemplate(movingMesh);
-	transform->Initialize();
+	transform->SetMeshTemplate(movingMesh); // this transformation type needs a mesh as a template
+	transform->Initialize();  // With a template mesh, the transformation can allocate
+                              // the parameters based on the number of vertices
 	transform->SetIdentity();
 	std::cout<<transform->GetNumberOfParameters()<<std::endl;
 

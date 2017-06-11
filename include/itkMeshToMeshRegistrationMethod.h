@@ -23,6 +23,11 @@
 #include "itkDataObjectDecorator.h"
 
 namespace itk {
+    /** \class MeshToMeshRegistrationMethod
+     *  \brief This class is templated over pointset-to-pointset registration method
+     *
+     */
+    
 template< typename TFixedMesh, typename TMovingMesh>
 class ITK_TEMPLATE_EXPORT MeshToMeshRegistrationMethod : public ProcessObject
 {
@@ -103,7 +108,7 @@ public:
 	/** Returns the transform resulting from the registration process  */
 	const TransformOutputType * GetOutput() const;
 
-	/** Deforms the pointset using the resulting transformation */
+	/** Deforms the pointset of the moving mesh using the resulting transformation */
 	void GetDeformedMesh();
 
 	/** Make a DataObject of the correct type to be used as the specified

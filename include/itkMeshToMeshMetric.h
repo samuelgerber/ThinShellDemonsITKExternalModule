@@ -27,18 +27,13 @@
 namespace itk
 {
 /** \class MeshToMeshMetric
- * \brief Computes similarity between two point sets.
+ * \brief Computes similarity between two meshes.
+ *        This Class is templated over the type of the two point-sets. 
+ *        This Class serves as the base for all kinds of mesh-to-mesh metrics
+ * \brief It expects a mesh-to-mesh transformation to be plugged in.
+ *        This class computes a value (also with derivative) that measures a registration metric between 
+ *        the fixed mesh and the moving mesh.
  *
- * This Class is templated over the type of the two point-sets.  It
- * expects a Transform to be plugged in.  This particular
- * class is the base class for a hierarchy of point-set to point-set metrics.
- *
- * This class computes a value that measures the similarity between the fixed point-set
- * and the transformed moving point-set.
- *
- * \ingroup RegistrationMetrics
- *
- * \ingroup ITKRegistrationCommon
  */
 
 template< typename TFixedMesh,  typename TMovingMesh >

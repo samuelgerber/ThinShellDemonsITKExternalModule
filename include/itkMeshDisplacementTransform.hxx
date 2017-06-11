@@ -72,10 +72,6 @@ MeshDisplacementTransform<TParametersValueType, NDimensions>
 ::GetParameters() const
 {
 
-// 	for( unsigned int i = 0; i < ParametersDimension; i++ )
-// 	{
-// 		this->m_Parameters[i] = this->m_VectorField[i];
-// 	}
 	return this->m_VectorField;
 }
 
@@ -106,7 +102,8 @@ void
 		itkExceptionMacro(<< "FixedMesh is not present");
 	}
 
-	//m_VectorField = VectorFieldType::New();
+	// the size of the parameters can only be determined after knowing the number of vertices
+    // the template mesh should be available before this initialization step
 	m_VectorField.SetSize(m_MeshTemplate->GetNumberOfPoints() * SpaceDimension);
 	m_VectorField.Fill(0);
 	this->ParametersDimension = m_VectorField.GetSize();
@@ -119,8 +116,6 @@ MeshDisplacementTransform<TParametersValueType, NDimensions>
 ::PrintSelf(std::ostream & os, Indent indent) const
 {
   Superclass::PrintSelf(os, indent);
-
-//  os << indent << "Offset: " << m_Offset << std::endl;
 }
 
 
@@ -168,22 +163,6 @@ MeshDisplacementTransform<TParametersValueType, NDimensions>
 {
   return vect;
 }
-
-
-// template<typename TParametersValueType, unsigned int NDimensions>
-// bool
-// MeshDisplacementTransform<TParametersValueType, NDimensions>
-// ::GetInverse(Self *inverse) const
-// {
-//   if( !inverse )
-//     {
-//     return false;
-//     }
-// 
-//   inverse->SetFixedParameters(this->GetFixedParameters());
-//   inverse->m_Offset   = -m_Offset;
-//   return true;
-// }
 
 
 template<typename TParametersValueType, unsigned int NDimensions>

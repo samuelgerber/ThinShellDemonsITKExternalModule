@@ -27,19 +27,12 @@ namespace itk
 {
 
 /** \class MeshDisplacementTransform
- * \brief MeshDisplacement transformation of a vector space (e.g. space coordinates)
+ *  \brief MeshDisplacementTransformation defines a finite dimensional vector space defined on mesh vertices (e.g. space coordinates)
+ *         the parameter m_VectorField is a 1D array in the form of [x_1,y_1,z_1,x_2,y_2,z_2,...], where the subscript is the index of a vertex.
+ *  
+ *  \brief A mesh has to be associated with the transformation to serve as the template
+ *         The template essentially defines the number of vertices, so that m_VectorField can be initialized and allocated with a correct size.
  *
- * The same functionality could be obtained by using the Affine transform,
- * but with a large difference in performace.
- *
- * \ingroup ITKTransform
- *
- * \wiki
- * \wikiexample{SimpleOperations/MeshDisplacementTransform,Translate an image}
- * \wikiexample{VectorImages/VectorResampleImageFilter,Translate a vector image}
- * \wikiexample{Registration/ImageRegistrationMethod,A basic global registration of two images}
- * \wikiexample{Registration/MutualInformation,Mutual Information}
- * \endwiki
  */
 template<typename TParametersValueType=double,
            unsigned int NDimensions = 3>
@@ -59,10 +52,6 @@ public:
   /** Run-time type information (and related methods). */
   itkTypeMacro(MeshDisplacementTransform, Transform);
 
-  /** Dimension of the domain space. */
-//   itkStaticConstMacro(SpaceDimension, unsigned int, NDimensions);
-//   itkStaticConstMacro(ParametersDimension, unsigned int, NDimensions);
-
   /** Standard scalar type for this class. */
   typedef typename Superclass::ScalarType ScalarType;
 
@@ -76,27 +65,9 @@ public:
   /** The number of parameters defininig this transform. */
   typedef typename Superclass::NumberOfParametersType NumberOfParametersType;
 
-  /** Standard covariant vector type for this class. */
-//   typedef CovariantVector<TParametersValueType, NDimensions> InputCovariantVectorType;
-//   typedef CovariantVector<TParametersValueType, NDimensions> OutputCovariantVectorType;
-
-  /** Standard vnl_vector type for this class. */
-//   typedef vnl_vector_fixed<TParametersValueType, NDimensions> InputVnlVectorType;
-//   typedef vnl_vector_fixed<TParametersValueType, NDimensions> OutputVnlVectorType;
-
-  /** Standard coordinate point type for this class. */
-//   typedef Point<TParametersValueType, NDimensions> InputPointType;
-//   typedef Point<TParametersValueType, NDimensions> OutputPointType;
 
   /** Transform category type. */
   typedef typename Superclass::TransformCategoryType TransformCategoryType;
-
-  /** Displacement field for this class. */
-//   typedef itk::Vector< TParametersValueType, NDimensions >    PixelType;
-//   typedef itk::Mesh< PixelType, NDimensions > MeshDeformationType;
-//   typedef typename MeshDeformationType::Pointer MeshDeformationPointer;
-//   typedef typename MeshDeformationType::PointsContainer::ConstIterator    MeshDeformationPointIterator;
-//   typedef typename MeshDeformationType::PointDataContainer::ConstIterator MeshDeformationPointDataIterator;
 
   typedef itk::Mesh< TParametersValueType, NDimensions > MeshType;
   typedef typename MeshType::ConstPointer MeshConstPointer;
@@ -106,13 +77,6 @@ public:
   /** Set/Get the Mesh. */
   itkSetConstObjectMacro(MeshTemplate, MeshType);
   itkGetConstObjectMacro(MeshTemplate, MeshType);
-
-   /** This method returns the value of the offset of the
-   * TranslationTransform. */
-//   const OutputVectorType & GetOffset(void) const
-//   {
-//     return m_Offset;
-//   }
 
   /** This method sets the parameters for the transform
    * value specified by the user. */
@@ -209,7 +173,6 @@ private:
   MeshConstPointer m_MeshTemplate;
   JacobianType     m_IdentityJacobian;
   ParametersType m_VectorField;
-  //OutputVectorType m_Offset; // Offset of the transformation
 };                           // class MeshDisplacementTransform
 
 // Back transform a point

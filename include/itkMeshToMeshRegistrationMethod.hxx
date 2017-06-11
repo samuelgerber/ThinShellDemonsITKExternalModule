@@ -172,7 +172,7 @@ template< typename TFixedMesh, typename TMovingMesh >
 void
 	MeshToMeshRegistrationMethod< TFixedMesh, TMovingMesh >
 	::GetDeformedMesh(){
-		// derivative of data fidelity energy (squared distance to target position)
+		// update the moving mesh with the current transformation
 		typedef typename MovingMeshType::PointsContainer  OutputPointsContainer;
 		typedef typename MovingMeshType::PointsContainer  InputPointsContainer;
 
@@ -189,7 +189,7 @@ void
 		{
 			const typename TMovingMesh::PointType & originalPoint = inputPoint.Value();
 			typename TMovingMesh::PointType   displacedPoint;
-			//MovingMeshType::PointType::VectorType vec;
+			
 			for ( unsigned int i = 0; i < 3; i++ )
 			{
 				displacedPoint[i] = originalPoint[i] + m_VectorField[idx*3 + i];

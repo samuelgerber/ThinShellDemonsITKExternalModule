@@ -6,8 +6,6 @@ Registration. It is designed to work with the ITKv4
 modular system and  to be places it ITK/Modules/External or uses as a
 Remote module.
 
-This modular is empty it is just a template to be used as a starting
-point for a module with acutal content.
 
 Getting Started
 ===============
@@ -17,44 +15,26 @@ http://www.itk.org/Wiki/ITK_Release_4/Modularization/Add_an_external_module_(ext
 http://www.itk.org/Wiki/ITK/Policy_and_Procedures_for_Adding_Remote_Modules
 
 
-External Module
----------------
+Thin Shell Demons External Module
+=================================
 
-The following is a breif list of instructions to get a external module
-started in a repository:
+Thin Shell Demons External Module is a mesh-to-mesh registration external module. 
+Reference: "Thin Shell Demons: Zhao Q, Price T, Pizer S, Niethammer M, Alterovitz R, Rosenman J, MIUA 2015
 
-mkdir ITK/Modules/External/itkMyModule
-cd ITK/Modules/External/itkMyModule
-git init
-git fetch git@github.com:blowekamp/itkExternalTemplate.git
-git merge FETCH_HEAD
+Following the standard ITK registration workflow, this module has the followings components (files)
+1. Transformation (itkMeshDisplacementTransform)
+	MeshDisplacementTransformation defines a finite dimensional vector space defined on mesh vertices (e.g. space coordinates). The parameter m_VectorField is a 1D array in the form of [x_1,y_1,z_1,x_2,y_2,z_2,...], where the subscript is the index of a vertex. A mesh has to be associated with the transformation to serve as the template. The template essentially defines the number of vertices, so that m_VectorField can be initialized and allocated with a correct size.
 
-Remote Module
--------------
+2. Metric (itkMeshToMeshMetric -> itkThinShellDemonsMetric)
+	MeshToMeshMetric: This class is templated over the type of the two point-sets. This class serves as the base for all kinds of mesh-to-mesh metrics (in some sense computing the similarity between two meshes). It expects a mesh-to-mesh transformation to be plugged in. This class computes a value (also with derivative) that measures a registration metric between the fixed mesh and the moving mesh.
+	ThinShellDemonsMetric: This Class inherits the base MeshToMeshMetric. It expects a mesh-to-mesh transformaton to be plugged in. This class computes a metric value, which is a combination of geometric feature matching quality and the Thin Shell deformation Energy. This metric computation part (objective function) is the core of the Thin Shell Demons algorithm. When initializing a metric object of this class with two meshes, the metric object first pre-computes geometric feature matching between the two meshes. The matching results stay the same during the optimization process.
 
-After a module has been created as a git repository it can be included
-as a remote module, which enables automatic fetching. Add a file in
-"ITK/Modules/Remote" called "YourModule.remote.cmake", for this module
-it would be "ExternalExample.remote.cmake" with the followlowing contents:
+3. Optimizer
+	Different thin shell energy approximation leads to different objective function formulations, thereby requiring different optimizers. The current objective function adopts a quadratic form. Therefore, Conjugate Gradient is a preferable optimizer.
 
-itk_fetch_module(ExternalTemplate
-  "A template for a module."
-  GIT_REPOSITORY http://github.com/blowekamp/itkExternalTemplate.git
-  GIT_TAG master
-  )
+4. Registration Method (itkMeshToMeshRegistrationMethod)
+	This class is templated over pointset-to-pointset registration method. Users will create an object of this class to perform Thin Shell Demons. See the test example for usage.
 
-Editing
--------
-
-The CMakeLists.txt and itk-modules need to be modified with the name
-of the module, something along the following:
-
-sed 's/ExternalTemplate/MyModule/g' CMakeLists.txt itk-module.cmake
-
-There is the inplace option to sed, but it's not portable, so do this
-change by hand or look up the option in sed.
-
-Then hack away at you code in include, src, and tests.
 
 License
 =======
@@ -67,4 +47,4 @@ Author
 ======
 
 
-Bradley Lowekamp
+Qingyu Zhao

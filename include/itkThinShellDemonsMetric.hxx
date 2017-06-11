@@ -64,7 +64,8 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 		  m_FixedMesh->GetSource()->Update();
 	  }
 
-	  // Preprocessing: compute the target position of each vertex using Euclidean + Curvature distance
+	  // Preprocessing: compute the target position of each vertex in the fixed mesh
+      // using Euclidean + Curvature distance
 	  ComputeTargetPosition();
   }
 
@@ -92,6 +93,8 @@ void
 	MovingPointIterator pointItr = movingMesh->GetPoints()->Begin();
 	MovingPointIterator pointEnd = movingMesh->GetPoints()->End();
 
+    // In principal, this part should implement Euclidean + geometric feature similarity
+    // Currently, this is simply a closest point search
 	int identifier = 0;
 	while ( pointItr != pointEnd )
 	{
@@ -171,8 +174,10 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 	vec[0] = parameters[identifier*3];
 	vec[1] = parameters[identifier*3+1];
 	vec[2] = parameters[identifier*3+2];
+    // get the transformed vertex
 	typename Superclass::OutputPointType transformedPoint = inputPoint + vec;
 
+    // compute squared Euclidean distance to its target position
 	InputPointType targetPoint = targetMap.ElementAt (identifier);
 	double dist = targetPoint.SquaredEuclideanDistanceTo(transformedPoint);
 

@@ -132,7 +132,7 @@ int itkEmptyTest( int , char * [])
                               // the parameters based on the number of vertices
 	transform->SetIdentity();
 	std::cout<<transform->GetNumberOfParameters()<<std::endl;
-
+	std::cout<<movingMesh->GetNumberOfPoints() <<std::endl;
 	/*
 		Initialize Thin Shell Demons optimizer
 	*/
@@ -179,7 +179,7 @@ int itkEmptyTest( int , char * [])
 	*/
 	typedef itk::VTKPolyDataWriter<MeshType>   WriterType;
 	WriterType::Pointer writer = WriterType::New();
-	registration->GetDeformedMesh();
+	registration->UpdateMovingMesh();
 	MeshType::ConstPointer registeredMesh = registration->GetMovingMesh();
 	writer->SetInput( registeredMesh );
 	writer->SetFileName( "registeredMesh.vtk" );

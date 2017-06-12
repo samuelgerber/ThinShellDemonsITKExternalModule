@@ -211,13 +211,13 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 	}
 
 
-	if( derivative.GetSize() != fixedMesh->GetNumberOfPoints() * 3 )
+	if( derivative.GetSize() != movingMesh->GetNumberOfPoints() * 3 )
 	{
-		derivative = DerivativeType(fixedMesh->GetNumberOfPoints() * 3);
+		derivative = DerivativeType(movingMesh->GetNumberOfPoints() * 3);
 	}
 	memset( derivative.data_block(),
 		0,
-		fixedMesh->GetNumberOfPoints() * 3 * sizeof( double ) );
+		movingMesh->GetNumberOfPoints() * 3 * sizeof( double ) );
 
 	// derivative of data fidelity energy (squared distance to target position)
 	MovingPointIterator pointItr = movingMesh->GetPoints()->Begin();

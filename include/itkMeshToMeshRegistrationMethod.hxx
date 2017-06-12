@@ -171,7 +171,7 @@ DataObject::Pointer
 template< typename TFixedMesh, typename TMovingMesh >
 void
 	MeshToMeshRegistrationMethod< TFixedMesh, TMovingMesh >
-	::GetDeformedMesh(){
+	::UpdateMovingMesh(){
 		// update the moving mesh with the current transformation
 		typedef typename MovingMeshType::PointsContainer  OutputPointsContainer;
 		typedef typename MovingMeshType::PointsContainer  InputPointsContainer;

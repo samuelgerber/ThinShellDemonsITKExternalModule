@@ -109,7 +109,7 @@ public:
 	const TransformOutputType * GetOutput() const;
 
 	/** Deforms the pointset of the moving mesh using the resulting transformation */
-	void GetDeformedMesh();
+	void UpdateMovingMesh();
 
 	/** Make a DataObject of the correct type to be used as the specified
 	* output. */

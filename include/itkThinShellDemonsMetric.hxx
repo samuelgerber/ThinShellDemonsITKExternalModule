@@ -205,8 +205,12 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 	  movingVTKMesh->GetPointCells(identifier, cellIdList);
 
 	  //enumerate all the neighboring vertices (edges) of a given vertex
-	  //measure the squared derivative along different edge directions
+	  //stretching energy : measure the squared derivative along different edge directions
+	  //bending energy : measure the local laplacian around the local patch using the given vertex and all neighboring vertices
 	  int neighborIdx;
+	  double lx = 0; //laplacian
+	  double ly = 0;
+	  double lz = 0;
 	  for(int i = 0; i < cellIdList->GetNumberOfIds(); i++)
 	  {
 		  vtkSmartPointer<vtkIdList> pointIdList =
@@ -218,12 +222,16 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 		  else
 			  neighborIdx = pointIdList->GetId(1);
 
+		  //derivative
 		  double dx = parameters[identifier*3] - parameters[neighborIdx*3];
 		  double dy = parameters[identifier*3+1] - parameters[neighborIdx*3+1];
 		  double dz = parameters[identifier*3+2] - parameters[neighborIdx*3+2];
 		  functionValue += m_StretchWeight * (dx*dx + dy*dy + dz*dz);
+
+		  lx += dx; ly += dy; lz += dz;
 	  }
 
+	  functionValue += m_BendWeight * (lx*lx + ly*ly + lz*lz);
 	  ++pointItr;
 	  identifier++;
   }
@@ -287,7 +295,7 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 		identifier++;
 	}
 
-	// stretching energy
+	// derivative of stretching & bending energy
 	identifier = 0;
 	pointItr = movingMesh->GetPoints()->Begin();
 	pointEnd = movingMesh->GetPoints()->End();
@@ -298,6 +306,9 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 		movingVTKMesh->GetPointCells(identifier, cellIdList);
 
 		int neighborIdx;
+		double lx = 0;
+		double ly = 0;
+		double lz = 0;
 		for(int i = 0; i < cellIdList->GetNumberOfIds(); i++)
 		{
 			vtkSmartPointer<vtkIdList> pointIdList =
@@ -319,6 +330,27 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 			derivative[neighborIdx*3]   -= 2 * dx * m_StretchWeight;
 			derivative[neighborIdx*3+1] -= 2 * dy * m_StretchWeight;
 			derivative[neighborIdx*3+2] -= 2 * dz * m_StretchWeight;
+
+			lx += dx; ly += dy; lz += dz;
+		}
+
+		for(int i = 0; i < cellIdList->GetNumberOfIds(); i++)
+		{
+			vtkSmartPointer<vtkIdList> pointIdList =
+				vtkSmartPointer<vtkIdList>::New();
+			movingVTKMesh->GetCellPoints(cellIdList->GetId(i), pointIdList);
+
+			if(pointIdList->GetId(0) != identifier)
+				neighborIdx = pointIdList->GetId(0);
+			else
+				neighborIdx = pointIdList->GetId(1);
+
+			derivative[identifier*3]   += 2 * lx * m_BendWeight;
+			derivative[identifier*3+1] += 2 * ly * m_BendWeight;
+			derivative[identifier*3+2] += 2 * lz * m_BendWeight;
+			derivative[neighborIdx*3]   -= 2 * lx * m_BendWeight;
+			derivative[neighborIdx*3+1] -= 2 * ly * m_BendWeight;
+			derivative[neighborIdx*3+2] -= 2 * lz * m_BendWeight;
 		}
 
 		++pointItr;

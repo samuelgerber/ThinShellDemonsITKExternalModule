@@ -105,7 +105,8 @@ public:
   /** Set/Get algorithm parameters **/
   void SetStretchWeight(double weight){m_StretchWeight = weight;}
   double getStretchWeight(){return m_StretchWeight;}
-
+  void SetBendWeight(double weight){m_BendWeight = weight;}
+  double getBendWeight(){return m_BendWeight;}
 protected:
   ThinShellDemonsMetric();
   virtual ~ThinShellDemonsMetric() {}

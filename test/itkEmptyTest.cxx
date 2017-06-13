@@ -120,6 +120,7 @@ int itkEmptyTest( int , char * [])
 		MetricType;
 	MetricType::Pointer  metric = MetricType::New();
 	metric->SetStretchWeight(4);
+	metric->SetBendWeight(1);
 	/*
 		Initialize Thin Shell Demons transformation
 	*/

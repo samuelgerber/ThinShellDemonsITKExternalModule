@@ -29,6 +29,8 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 ::ThinShellDemonsMetric() :
   m_TargetPositionComputed( false )
 {
+	m_BendWeight = 1;
+	m_StretchWeight = 1;
 }
   /** Initialize the metric */
   template< typename TFixedMesh, typename TMovingMesh, typename TDistanceMap >
@@ -135,6 +137,11 @@ void
 	}
 
 	m_TargetPositionComputed = true;
+
+	//generate a VTK copy of the same mesh
+	itkMeshTovtkPolyData* dataTransfer = new itkMeshTovtkPolyData();
+	dataTransfer->SetInput(movingMesh);
+	movingVTKMesh = dataTransfer->GetOutput();
 }
 
 template< typename TFixedMesh, typename TMovingMesh, typename TDistanceMap >
@@ -187,6 +194,40 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
     identifier++;
     }
 
+  // stretching energy
+  identifier = 0;
+  pointItr = movingMesh->GetPoints()->Begin();
+  pointEnd = movingMesh->GetPoints()->End();
+  while ( pointItr != pointEnd )
+  {
+	  vtkSmartPointer<vtkIdList> cellIdList =
+		  vtkSmartPointer<vtkIdList>::New();
+	  movingVTKMesh->GetPointCells(identifier, cellIdList);
+
+	  //enumerate all the neighboring vertices (edges) of a given vertex
+	  //measure the squared derivative along different edge directions
+	  int neighborIdx;
+	  for(int i = 0; i < cellIdList->GetNumberOfIds(); i++)
+	  {
+		  vtkSmartPointer<vtkIdList> pointIdList =
+			  vtkSmartPointer<vtkIdList>::New();
+		  movingVTKMesh->GetCellPoints(cellIdList->GetId(i), pointIdList);
+
+		  if(pointIdList->GetId(0) != identifier)
+			  neighborIdx = pointIdList->GetId(0);
+		  else
+			  neighborIdx = pointIdList->GetId(1);
+
+		  double dx = parameters[identifier*3] - parameters[neighborIdx*3];
+		  double dy = parameters[identifier*3+1] - parameters[neighborIdx*3+1];
+		  double dz = parameters[identifier*3+2] - parameters[neighborIdx*3+2];
+		  functionValue += m_StretchWeight * (dx*dx + dy*dy + dz*dz);
+	  }
+
+	  ++pointItr;
+	  identifier++;
+  }
+
   return functionValue;
 }
 
@@ -195,7 +236,7 @@ void
 ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 ::GetDerivative( const TransformParametersType & parameters,
                  DerivativeType & derivative ) const
-{// Set output values to zero
+{
 	FixedMeshConstPointer fixedMesh = this->GetFixedMesh();
 
 	if ( !fixedMesh )
@@ -241,6 +282,44 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 		derivative[identifier*3]     = -2 * distVec[0];
 		derivative[identifier*3 + 1] = -2 * distVec[1];
 		derivative[identifier*3 + 2] = -2 * distVec[2];
+
+		++pointItr;
+		identifier++;
+	}
+
+	// stretching energy
+	identifier = 0;
+	pointItr = movingMesh->GetPoints()->Begin();
+	pointEnd = movingMesh->GetPoints()->End();
+	while ( pointItr != pointEnd )
+	{
+		vtkSmartPointer<vtkIdList> cellIdList =
+			vtkSmartPointer<vtkIdList>::New();
+		movingVTKMesh->GetPointCells(identifier, cellIdList);
+
+		int neighborIdx;
+		for(int i = 0; i < cellIdList->GetNumberOfIds(); i++)
+		{
+			vtkSmartPointer<vtkIdList> pointIdList =
+				vtkSmartPointer<vtkIdList>::New();
+			movingVTKMesh->GetCellPoints(cellIdList->GetId(i), pointIdList);
+
+			if(pointIdList->GetId(0) != identifier)
+				neighborIdx = pointIdList->GetId(0);
+			else
+				neighborIdx = pointIdList->GetId(1);
+
+			double dx = parameters[identifier*3] - parameters[neighborIdx*3];
+			double dy = parameters[identifier*3+1] - parameters[neighborIdx*3+1];
+			double dz = parameters[identifier*3+2] - parameters[neighborIdx*3+2];
+
+			derivative[identifier*3]   += 2 * dx * m_StretchWeight;
+			derivative[identifier*3+1] += 2 * dy * m_StretchWeight;
+			derivative[identifier*3+2] += 2 * dz * m_StretchWeight;
+			derivative[neighborIdx*3]   -= 2 * dx * m_StretchWeight;
+			derivative[neighborIdx*3+1] -= 2 * dy * m_StretchWeight;
+			derivative[neighborIdx*3+2] -= 2 * dz * m_StretchWeight;
+		}
 
 		++pointItr;
 		identifier++;

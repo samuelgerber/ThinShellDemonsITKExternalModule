@@ -49,7 +49,7 @@ public:
 			return;
 		}
 
-		std::cout << "Position = "  << optimizer->GetCachedCurrentPosition();
+		std::cout << "Position = "  << optimizer->GetCachedValue();
 		std::cout << std::endl << std::endl;
 	}
 };
@@ -119,7 +119,7 @@ int itkEmptyTest( int , char * [])
 		MeshType>
 		MetricType;
 	MetricType::Pointer  metric = MetricType::New();
-
+	metric->SetStretchWeight(4);
 	/*
 		Initialize Thin Shell Demons transformation
 	*/
@@ -133,6 +133,7 @@ int itkEmptyTest( int , char * [])
 	transform->SetIdentity();
 	std::cout<<transform->GetNumberOfParameters()<<std::endl;
 	std::cout<<movingMesh->GetNumberOfPoints() <<std::endl;
+
 	/*
 		Initialize Thin Shell Demons optimizer
 	*/
@@ -172,7 +173,8 @@ int itkEmptyTest( int , char * [])
 		std::cout << e << std::endl;
 		return EXIT_FAILURE;
 	}
-	std::cout << "Solution = " << transform->GetParameters() << std::endl;
+
+	//std::cout << "Solution = " << transform->GetParameters() << std::endl;
 
 	/*
 		output mesh

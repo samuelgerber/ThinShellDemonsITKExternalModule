@@ -153,6 +153,7 @@ private:
 
 	ParametersType m_InitialTransformParameters;
 	ParametersType m_LastTransformParameters;
+
 };
 
 }

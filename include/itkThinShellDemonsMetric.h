@@ -22,6 +22,8 @@
 #include "itkCovariantVector.h"
 #include "itkMesh.h"
 #include "itkImage.h"
+#include "itkMeshTovtkPolyData.h"
+#include "vtkSmartPointer.h"
 
 namespace itk
 {
@@ -99,6 +101,11 @@ public:
   /** Initialize the Metric by computing a target position for each vertex in the fixed mesh using
       Euclidean + Curvature distance */
   virtual void Initialize(void) throw ( ExceptionObject ) ITK_OVERRIDE;
+
+  /** Set/Get algorithm parameters **/
+  void SetStretchWeight(double weight){m_StretchWeight = weight;}
+  double getStretchWeight(){return m_StretchWeight;}
+
 protected:
   ThinShellDemonsMetric();
   virtual ~ThinShellDemonsMetric() {}
@@ -110,6 +117,10 @@ private:
 
   bool               m_TargetPositionComputed;
   TargetMapType targetMap;
+  vtkSmartPointer<vtkPolyData> movingVTKMesh;
+  double m_StretchWeight;
+  double m_BendWeight;
+
   void ComputeTargetPosition();
 };
 } // end namespace itk

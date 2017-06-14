@@ -30,14 +30,7 @@ namespace itk
 /** \class ThinShellDemonsMetric
  * \brief This Class inherits the base MeshToMeshMetric
  *
- * \brief It expects a mesh-to-mesh transformaton to be plugged in.
- *        This class computes a metric value, which is a combination of
- *        geometric feature matching quality and the Thin Shell deformation Energy.
- *        This metric computation part (objective function) is the core of the Thin Shell Demons algorithm
- *
- * \usage When initializing a metric object of this class with two meshes, the metric object first
- *        pre-computes geometric feature matching between the two meshes. The matching results stay the same
- *        during the optimization process.
+ * \brief This Class inherits the basic MeshToMeshMetric. It expects a mesh-to-mesh transformaton to be plugged in. This class computes a metric value, which is a combination of geometric feature matching quality and the Thin Shell deformation Energy. This metric computation part (objective function) is the core of the Thin Shell Demons algorithm. When initializing a metric object of this class with two meshes, the metric object first pre-computes geometric feature matching between the two meshes. The matching results stay the same during the optimization process.
  *
  *  Reference: "Thin Shell Demons: Zhao Q, Price T, Pizer S, Niethammer M, Alterovitz R, Rosenman J, MIUA 2015
  *
@@ -118,7 +111,9 @@ private:
 
   bool               m_TargetPositionComputed;
   TargetMapType targetMap;
-  vtkSmartPointer<vtkPolyData> movingVTKMesh;
+    
+  vtkSmartPointer<vtkPolyData> movingVTKMesh; // a VTKPolyData copy of the moving mesh
+    
   double m_StretchWeight;
   double m_BendWeight;
 

@@ -27,12 +27,8 @@
 namespace itk
 {
 /** \class MeshToMeshMetric
- * \brief Computes similarity between two meshes.
- *        This Class is templated over the type of the two point-sets. 
- *        This Class serves as the base for all kinds of mesh-to-mesh metrics
- * \brief It expects a mesh-to-mesh transformation to be plugged in.
- *        This class computes a value (also with derivative) that measures a registration metric between 
- *        the fixed mesh and the moving mesh.
+ *
+ * \brief This class is templated over the type of PointsetToPointsetMetric. This class serves as the basis for all kinds of mesh-to-mesh metrics (in some sense computing the similarity between two meshes). It expects a mesh-to-mesh transformation to be plugged in. This class computes an objective function value (also with its derivative w.r.t. the transformation parameters) that measures a registration metric between the fixed mesh and the moving mesh.
  *
  */
 

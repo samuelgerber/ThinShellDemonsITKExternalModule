@@ -27,11 +27,9 @@ namespace itk
 {
 
 /** \class MeshDisplacementTransform
- *  \brief MeshDisplacementTransformation defines a finite dimensional vector space defined on mesh vertices (e.g. space coordinates)
- *         the parameter m_VectorField is a 1D array in the form of [x_1,y_1,z_1,x_2,y_2,z_2,...], where the subscript is the index of a vertex.
- *  
- *  \brief A mesh has to be associated with the transformation to serve as the template
- *         The template essentially defines the number of vertices, so that m_VectorField can be initialized and allocated with a correct size.
+ *  \brief The class "MeshDisplacementTransformation" defines a finite dimensional vector space on mesh vertices. Its private member m_VectorField is a 1D parameter array in the form of [x_1,y_1,z_1,x_2,y_2,z_2,...], where the subscript denote the index of the vertex.
+ *
+ *  \brief A mesh has to be initially associated with a transformation object to serve as a template. The template essentially designates the number of vertices, so that m_VectorField can be initialized and allocated with a correct size (# of vertices * 3)
  *
  */
 template<typename TParametersValueType=double,

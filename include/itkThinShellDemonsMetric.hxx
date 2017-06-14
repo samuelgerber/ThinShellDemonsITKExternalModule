@@ -226,11 +226,13 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 		  double dx = parameters[identifier*3] - parameters[neighborIdx*3];
 		  double dy = parameters[identifier*3+1] - parameters[neighborIdx*3+1];
 		  double dz = parameters[identifier*3+2] - parameters[neighborIdx*3+2];
+          // stretching energy associated with an edge
 		  functionValue += m_StretchWeight * (dx*dx + dy*dy + dz*dz);
 
 		  lx += dx; ly += dy; lz += dz;
 	  }
 
+      //bending energy associated with a vertex-ring stencil
 	  functionValue += m_BendWeight * (lx*lx + ly*ly + lz*lz);
 	  ++pointItr;
 	  identifier++;
@@ -324,6 +326,7 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 			double dy = parameters[identifier*3+1] - parameters[neighborIdx*3+1];
 			double dz = parameters[identifier*3+2] - parameters[neighborIdx*3+2];
 
+            // derivative of stretching energy
 			derivative[identifier*3]   += 2 * dx * m_StretchWeight;
 			derivative[identifier*3+1] += 2 * dy * m_StretchWeight;
 			derivative[identifier*3+2] += 2 * dz * m_StretchWeight;
@@ -345,6 +348,7 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 			else
 				neighborIdx = pointIdList->GetId(1);
 
+            // derivative of bending energy
 			derivative[identifier*3]   += 2 * lx * m_BendWeight;
 			derivative[identifier*3+1] += 2 * ly * m_BendWeight;
 			derivative[identifier*3+2] += 2 * lz * m_BendWeight;

@@ -39,31 +39,31 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 	  ::Initialize(void)
 	  throw ( ExceptionObject )
   {
-	  if ( !m_Transform )
+	  if ( !this->m_Transform )
 	  {
 		  itkExceptionMacro(<< "Transform is not present");
 	  }
 
-	  if ( !m_MovingMesh )
+	  if ( !this->m_MovingMesh )
 	  {
 		  itkExceptionMacro(<< "MovingMesh is not present");
 	  }
 
-	  if ( !m_FixedMesh )
+	  if ( !this->m_FixedMesh )
 	  {
 		  itkExceptionMacro(<< "FixedMesh is not present");
 	  }
 
 	  // If the Mesh is provided by a source, update the source.
-	  if ( m_MovingMesh->GetSource() )
+	  if ( this->m_MovingMesh->GetSource() )
 	  {
-		  m_MovingMesh->GetSource()->Update();
+		  this->m_MovingMesh->GetSource()->Update();
 	  }
 
 	  // If the point set is provided by a source, update the source.
-	  if ( m_FixedMesh->GetSource() )
+	  if ( this->m_FixedMesh->GetSource() )
 	  {
-		  m_FixedMesh->GetSource()->Update();
+		  this->m_FixedMesh->GetSource()->Update();
 	  }
 
 	  // Preprocessing: compute the target position of each vertex in the fixed mesh
@@ -74,7 +74,7 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 template< typename TFixedMesh, typename TMovingMesh, typename TDistanceMap >
 void
 	ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
-	::ComputeTargetPosition() 
+	::ComputeTargetPosition()
 {
 	FixedMeshConstPointer fixedMesh = this->GetFixedMesh();
 
@@ -288,7 +288,7 @@ ThinShellDemonsMetric< TFixedMesh, TMovingMesh, TDistanceMap >
 
 		InputPointType targetPoint = targetMap.ElementAt (identifier);
 
-		InputPointType::VectorType distVec = targetPoint - inputPoint;
+		typename InputPointType::VectorType distVec = targetPoint - inputPoint;
 		derivative[identifier*3]     = -2 * distVec[0];
 		derivative[identifier*3 + 1] = -2 * distVec[1];
 		derivative[identifier*3 + 2] = -2 * distVec[2];

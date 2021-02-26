@@ -7,22 +7,17 @@ Cerdan, P.H. \"ITK Wavelet Module\".
   September, 2016.
 ")
 
-# itk_module() defines the module dependencies in ExternalTemplate
-# ExternalTemplate depends on ITKCommon
-# The testing module in ExternalTemplate depends on ITKTestKernel
-# and ITKMetaIO(besides ExternalTemplate and ITKCore)
-# By convention those modules outside of ITK are not prefixed with
-# ITK.
 
 # define the dependencies of the include module and the tests
 itk_module(ExternalTemplate
-  DEPENDS
+  ENABLE_SHARED
+  COMPILE_DEPENDS
     ITKCommon
-	ITKMesh
-	ITKRegistrationCommon
+	  ITKMesh
+	  ITKRegistrationCommon
+  	ITKVtkGlue
   TEST_DEPENDS
     ITKTestKernel
-	ITKVtkGlue
     ITKMetaIO
   DESCRIPTION
     "${DOCUMENTATION}"

@@ -21,13 +21,14 @@
 #include "itkProcessObject.h"
 #include "itkMeshToMeshMetric.h"
 #include "itkDataObjectDecorator.h"
+#include "itkSingleValuedNonLinearOptimizer.h"
 
 namespace itk {
     /** \class MeshToMeshRegistrationMethod
      *  \brief This class is templated over pointset-to-pointset registration method
      *
      */
-    
+
 template< typename TFixedMesh, typename TMovingMesh>
 class ITK_TEMPLATE_EXPORT MeshToMeshRegistrationMethod : public ProcessObject
 {
@@ -81,7 +82,7 @@ public:
 	/** Set/Get the Moving Mesh. */
 	itkSetObjectMacro(MovingMesh, MovingMeshType);
 	itkGetObjectMacro(MovingMesh, MovingMeshType);
-	
+
 	/** Set/Get the Optimizer. */
 	itkSetObjectMacro(Optimizer,  OptimizerType);
 	itkGetModifiableObjectMacro(Optimizer, OptimizerType);

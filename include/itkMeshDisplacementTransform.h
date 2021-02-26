@@ -63,9 +63,19 @@ public:
   /** The number of parameters defininig this transform. */
   typedef typename Superclass::NumberOfParametersType NumberOfParametersType;
 
-
   /** Transform category type. */
   typedef typename Superclass::TransformCategoryType TransformCategoryType;
+
+  typedef typename Superclass::InputPointType  InputPointType;
+  typedef typename Superclass::InputVectorType InputVectorType;
+  typedef typename Superclass::InputVnlVectorType InputVnlVectorType;
+  typedef typename Superclass::InputCovariantVectorType InputCovariantVectorType;
+  typedef typename Superclass::OutputPointType OutputPointType;
+  typedef typename Superclass::OutputVectorType OutputVectorType;
+  typedef typename Superclass::OutputVnlVectorType OutputVnlVectorType;
+  typedef typename Superclass::OutputCovariantVectorType OutputCovariantVectorType;
+
+  typedef typename Superclass::InverseTransformBasePointer InverseTransformBasePointer;
 
   typedef itk::Mesh< TParametersValueType, NDimensions > MeshType;
   typedef typename MeshType::ConstPointer MeshConstPointer;
@@ -89,12 +99,12 @@ public:
    * given point or vector, returning the transformed point or
    * vector. */
    OutputPointType     TransformPoint(const InputPointType  & point) const ITK_OVERRIDE;
- 
+
    using Superclass::TransformVector;
    OutputVectorType    TransformVector(const InputVectorType & vector) const ITK_OVERRIDE;
- 
+
    OutputVnlVectorType TransformVector(const InputVnlVectorType & vector) const ITK_OVERRIDE;
- 
+
    using Superclass::TransformCovariantVector;
    OutputCovariantVectorType TransformCovariantVector(const InputCovariantVectorType & vector) const ITK_OVERRIDE;
 

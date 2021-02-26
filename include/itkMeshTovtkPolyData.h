@@ -1,20 +1,21 @@
 #ifndef __itkMeshTovtkPolyData_h__
 #define __itkMeshTovtkPolyData_h__
 
-#include "vtkPoints.h"
-#include "vtkCellArray.h"
-#include "vtkPolyData.h"
+#include <vtkCellArray.h>
+#include <vtkPolyData.h>
+#include <vtkPoints.h>
+
 #include "itkDefaultDynamicMeshTraits.h"
 #include "itkMesh.h"
 #include "itkTriangleCell.h"
 #include "itkPoint.h"
 
 
-/** 
+/**
   \class itkMeshTovtkPolyData
-  \brief 
+  \brief
     \warning
-  \sa 
+  \sa
   */
 
 class itkMeshTovtkPolyData
@@ -31,8 +32,8 @@ class itkMeshTovtkPolyData
   typedef TriangleMeshType::PointsContainer                 InputPointsContainer;
   typedef InputPointsContainer::ConstPointer            InputPointsContainerPointer;
   typedef InputPointsContainer::ConstIterator           InputPointsContainerIterator;
-  typedef TriangleMeshType::CellType                        CellType; 
-  
+  typedef TriangleMeshType::CellType                        CellType;
+
   typedef TriangleMeshType::CellsContainerConstPointer           CellsContainerPointer;
   typedef TriangleMeshType::CellsContainerConstIterator          CellsContainerIterator;
   /**
@@ -47,7 +48,7 @@ class itkMeshTovtkPolyData
   vtkPoints  * m_Points;
   vtkPolyData * m_PolyData;
   vtkCellArray * m_Polys;
-  
+
 };
 
 #ifndef ITK_MANUAL_INSTANTIATION
